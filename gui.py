@@ -41,14 +41,18 @@ class App(Frame):
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(0, weight=1)
         for col in columns:
-            tv.heading(col, text=col, command=lambda _col=col:
+            tv.heading(col, command=lambda _col=col:
             treeview_sort_column(tv, _col, False))
 
     def loadTable(self):
         self.treeview.insert('', 'end', text="1", values=('title', '10:00',
                                                           '10:10', 'Ok', 'hello', 'goodbye', '1', '2', '3'))
         self.treeview.insert('', 'end', text="2", values=('second title', '20',
-                                                          '30', 'Ok', 'hello', 'goodbye', '1', '2', '3'))
+                                                          '30', 'Ok', 'goodbye', 'hello', '1', '2', '3'))
+        self.treeview.insert('', 'end', text="3", values=('second title', '20',
+                                                          '20', 'Ok', 'goodbye', 'hello', '1', '2', '3'))
+        self.treeview.insert('', 'end', text="4", values=('second title', '10',
+                                                          '30', 'Ok', 'zoodbye', 'hello', '1', '2', '3'))
 
 
 def main():
@@ -67,7 +71,7 @@ def treeview_sort_column(tv, col, reverse):
         tv.move(k, '', index)
 
     # reverse sort next time
-    tv.heading(col, command=lambda: \
+    tv.heading(col, command=lambda:
         treeview_sort_column(tv, col, not reverse))
 
 

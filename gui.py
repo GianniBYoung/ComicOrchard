@@ -31,7 +31,7 @@ class Table(Frame):
 
         tv.configure(xscrollcommand=scrollbar.set)
         tv.pack(fill=tk.BOTH, expand=True)
-        tv.bind("<<TreeviewSelect>>", self.on_double_click)
+        tv.bind("<Double-Button-1>", self.on_double_click)
         columns = ('title', 'type', 'series', 'number', 'issueID', 'date', 'writer', 'path')
         tv['columns'] = columns
         tv.heading("#0", text='')

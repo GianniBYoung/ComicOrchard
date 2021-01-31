@@ -48,7 +48,7 @@ class App(Frame):
         tv.column('issueID', anchor='w', width=200)
         tv.heading('date', text='Date')
         tv.column('date', anchor='w', width=100)
-        tv.heading('writer', text='Writer')
+        tv.heading('writer', text='Writer(s)')
         tv.column('writer', anchor='w', width=200)
         tv.heading('path', text='Path')
         tv.column('path', anchor='w', width=200)

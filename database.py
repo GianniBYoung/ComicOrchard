@@ -202,6 +202,15 @@ def search(text):
     return cursor.fetchall()
 
 
+def delete_selected_row(title):
+    con = sqlite3.connect('main.db')
+    con.execute("PRAGMA foreign_keys = on")
+    cursor = con.cursor()
+    cursor.execute(
+        "DELETE FROM comics WHERE title = " + '"' + title + '"'
+    )
+    con.commit()
+
 def main():
     create_database()
     populate_database("/home/gianni/.comicOrchard/main")

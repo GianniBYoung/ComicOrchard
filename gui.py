@@ -75,16 +75,18 @@ class Toolbar(Frame):
     # Creates toolbar with buttons at the top
     def create_toolbar(self):
         toolbar = tk.Frame(self.master, bg="#272626")
-        btnAddComic = HoverButton(self.master, text="Add Comic", activebackground="#C9C9C9", command=add_comic)
+        btnAddComic = HoverButton(self.master, text="Add Comic", activebackground="#C9C9C9", command=self.add_comic)
         btnAddComic.pack(in_=toolbar, side=tk.LEFT)
-        btnImportComics = HoverButton(self.master, text="Import Comics", activebackground="#C9C9C9", command=import_comics)
+        btnImportComics = HoverButton(self.master, text="Import Comics", activebackground="#C9C9C9", command=self.import_comics)
         btnImportComics.pack(in_=toolbar, side=tk.LEFT, padx=5)
+        btnDeleteRows = HoverButton(self.master, text="Delete Selected Rows", activebackground="#C9C9C9", command=self.delete_selected_rows)
+        btnDeleteRows.pack(in_=toolbar, side=tk.LEFT, padx=5)
         searchLabel = tk.Label(self.master, text="Search: ", bg="#272626", fg="white", font=("Times New Roman", 13))
         searchLabel.pack(in_=toolbar, side=tk.LEFT, padx=5)
         searchEntry = tk.Entry(self.master, width=45, bd=5)
         searchEntry.pack(in_=toolbar, side=tk.LEFT)
         searchEntry.bind('<Return>', self.search)
-        btnReset = HoverButton(self.master, text="Reset Search", activebackground="#C9C9C9", command=self.reset)
+        btnReset = HoverButton(self.master, text="Refresh", activebackground="#C9C9C9", command=self.refresh)
         btnReset.pack(in_=toolbar, side=tk.LEFT, padx=5)
         self.master.entry = searchEntry
         toolbar.pack(fill=tk.X)
@@ -106,7 +108,7 @@ class Toolbar(Frame):
             count += 1
 
     # Reset table to before the search
-    def reset(self):
+    def refresh(self):
         self.master.treeview.delete(*self.master.treeview.get_children())
         results = database.get_all_comic_info()
         count = 1
@@ -118,6 +120,27 @@ class Toolbar(Frame):
             self.master.treeview.insert('', 'end', text=count, values=(data[1], data[2], data[3], data[4], data[5],
                                                                        data[6], data[7], data[8]), tags=tag)
             count += 1
+
+    def delete_selected_rows(self):
+        selected_items = self.master.treeview.selection()
+        for selected_item in selected_items:
+            database.delete_selected_row(self.master.treeview.item(selected_item)['values'][0])
+            self.master.treeview.delete(selected_item)
+
+    # Button click to add comic - https://www.geeksforgeeks.org/file-explorer-in-python-using-tkinter/
+    def add_comic(self):
+        filename = filedialog.askopenfilename(initialdir="~",
+                                              title="Select a File",
+                                              filetypes=[("Comic Book Zips",
+                                                          "*.cbz*")])
+        database.addComic(filename)
+        self.refresh()
+
+    # button click to import comics
+    def import_comics(self):
+        filename = filedialog.askdirectory()
+        database.addComics(filename)
+        self.refresh()
 
 
 # button class to customize hover color - https://stackoverflow.com/questions/49888623/tkinter-hovering-over-button-color-change
@@ -181,23 +204,6 @@ def populate_table(self):
         self.treeview.insert('', 'end', text=comic[0], values=(comic[1], comic[2], comic[3], comic[4], comic[5],
                                                                comic[6], comic[7], comic[8]), tags=tag)
         count += 1
-
-
-# Button click to add comic - https://www.geeksforgeeks.org/file-explorer-in-python-using-tkinter/
-def add_comic():
-    filename = filedialog.askopenfilename(initialdir="~",
-                                          title="Select a File",
-                                          filetypes=[("Comic Book Zips",
-                                                      "*.cbz*")])
-    database.addComic(filename)
-    Toolbar.reset()
-
-
-# button click to import comics
-def import_comics():
-    filename = filedialog.askdirectory()
-    database.addComics(filename)
-    Toolbar.reset()
 
 
 def main():

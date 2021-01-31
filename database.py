@@ -1,4 +1,5 @@
 import sqlite3
+import subprocess
 import os
 import datetime
 import zipfile 
@@ -11,7 +12,6 @@ def obtainListOfPaths(path):
     for (dirpath, dirname, filenames) in os.walk(path, topdown=True):
         listOfFiles += [os.path.join(dirpath, file) for file in filenames]
     return listOfFiles
-
 
 
 #todo optimize this and make sure it checks if the directory needs to be created first
@@ -27,6 +27,9 @@ def addComic(source, destination):
     copyLibrary(source, destination)
     populate_database(destination)
 
+
+def openComicForReading(path):
+    subprocess.call(['mcomix', path])
 
 
 #returns a dictionary with metadata where the filename is the metadata file
@@ -121,7 +124,8 @@ def create_database():
 def main():
     create_database()
     #populate_database("/home/gianni/.comicOrchard/main")
-    addComic("/home/gianni/.comicOrchard/Batman Damned (1-3)","/home/gianni/.comicOrchard/main/")
+    #addComic("/home/gianni/.comicOrchard/Batman Damned (1-3)","/home/gianni/.comicOrchard/main/")
+    openComicForReading("/home/gianni/.comicOrchard/Batman Damned (1-3)/Batman_ Damned #1 - Brian Azzarello.cbz")
 
 
 if __name__ == "__main__":

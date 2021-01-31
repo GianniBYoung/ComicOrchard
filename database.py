@@ -7,6 +7,7 @@ import shutil
 from xml.dom import minidom
 from pathlib import Path
 
+
 def obtainListOfPaths(path):
     listOfFiles = list()
     for (dirpath, dirname, filenames) in os.walk(path, topdown=True):
@@ -19,6 +20,7 @@ def copyLibrary(source, destination):
     print("copying from "+source+" to "+destination)
     shutil.copytree(source, destination)
     print("copying complete")
+
 
 
 def addComic(source, destination):
@@ -106,19 +108,59 @@ def create_database():
 
     # creates Comics table
     cursor.execute("CREATE TABLE IF NOT EXISTS 'comics' ( \
-	    'id'	    INTEGER NOT NULL, \
-	    'title'	    TEXT, \
-	    'type'	    TEXT, \
+	    'id'	        INTEGER NOT NULL, \
+	    'title'	        TEXT, \
+	    'type'	        TEXT, \
 	    'series'	    TEXT, \
 	    'number'	    INTEGER, \
-	    'issueID'	    INTEGER UNIQUE, \
-	    'dateCreated'   TEXT, \
-	    'writer'        TEXT, \
-            'path'          TEXT NOT NULL UNIQUE, \
+	    'issueID'	    INTEGER, \
+	    'dateCreated'	TEXT, \
+        'writer'        TEXT, \
+        'path'          TEXT NOT NULL UNIQUE, \
 	    PRIMARY KEY('id' AUTOINCREMENT) \
     );")
 
     con.commit()
+
+
+def query_database(query):
+    con = sqlite3.connect('main.db')
+    con.execute("PRAGMA foreign_keys = on")
+    cursor = con.cursor()
+    cursor.execute(query)
+
+    con.commit()
+    return cursor.fetchall()
+
+
+def insert_comic(title, type, series, number, issueID, dateCreated, writer):
+    con = sqlite3.connect('main.db')
+    con.execute("PRAGMA foreign_keys = on")
+    cursor = con.cursor()
+
+    cursor.execute(
+        "INSERT INTO comics(title, type, series, number, issueID, dateCreated, writer) \
+        Values (?, ?, ?, ?, ?, ?, ?)", (title, type, series, number, issueID, dateCreated, writer))
+    con.commit()
+
+
+def clear_database():
+    con = sqlite3.connect('main.db')
+    con.execute("PRAGMA foreign_keys = on")
+    cursor = con.cursor()
+
+    cursor.executescript(
+        "DELETE FROM comics;\
+        UPDATE SQLITE_SEQUENCE SET SEQ=0 WHERE NAME='comics';"
+    )
+    con.commit()
+
+
+def get_all_comic_info():
+    comicList = query_database(
+        'SELECT * FROM comics'
+    )
+    return comicList
 
 
 def main():

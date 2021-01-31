@@ -30,209 +30,57 @@ def extractMetadata(path, filename):
     month = 0
     try:
         with zipfile.ZipFile(path) as zip_file:
-            try:
-                with zip_file.open(filename) as f:
-                    xmldoc = minidom.parse(f)
+            with zip_file.open(filename) as f:
+                xmldoc = minidom.parse(f)
 
-                    if len(xmldoc.getElementsByTagName("Notes")) == 0:
-                        print("no issueID found")
-                        metadataDict["issueID"] = 'NULL'
-                    else:
-                        metadataDict["issueID"] = xmldoc.getElementsByTagName('Notes')[0].firstChild.data.split('[')[1].split(' ')[2].split(']')[0]
-
-                    if len(xmldoc.getElementsByTagName("Series")) == 0:
-                        print("no series found")
-                        metadataDict["series"] = 'NULL'
-                    else:
-                        metadataDict["series"] = xmldoc.getElementsByTagName('Series')[0].firstChild.data
-
-
-                    if len(xmldoc.getElementsByTagName("Number")) == 0:
-                        print("no issue number found")
-                        metadataDict["number"] = 'NULL'
-                    else:
-                        metadataDict["number"] = xmldoc.getElementsByTagName('Number')[0].firstChild.data
-
-
-                    if len(xmldoc.getElementsByTagName("Title")) == 0:
-                        print("no title found")
-                        metadataDict["title"] = 'NULL'
-                    else:
-                        metadataDict["title"] = xmldoc.getElementsByTagName('Title')[0].firstChild.data
-
-
-                    if len(xmldoc.getElementsByTagName("Year")) == 0:
-                        print("no year found")
-                    else:
-                        year = xmldoc.getElementsByTagName('Year')[0].firstChild.data
-
-
-                    if len(xmldoc.getElementsByTagName("Month")) == 0:
-                        print("no month found")
-                    else:
-                        month = xmldoc.getElementsByTagName('Month')[0].firstChild.data
-
-
-                    if len(xmldoc.getElementsByTagName("Day")) == 0:
-                        print("no day found")
-                    else:
-                        day = xmldoc.getElementsByTagName('Day')[0].firstChild.data
-
-
-                    if len(xmldoc.getElementsByTagName("Writer")) == 0:
-                        print("no writer found")
-                        metadataDict["writer"] = 'NULL'
-                    else:
-                        metadataDict["writer"] = xmldoc.getElementsByTagName('Writer')[0].firstChild.data
-
-                    
-                    if len(xmldoc.getElementsByTagName("Penciller")) == 0:
-                        print("no penciller found")
-                        metadataDict["penciller"] = 'NULL'
-                    else:
-                        metadataDict["penciller"] = xmldoc.getElementsByTagName('Penciller')[0].firstChild.data
-
-
-                    if len(xmldoc.getElementsByTagName("Inker")) == 0:
-                        print("no inker found")
-                        metadataDict["inker"] = 'NULL'
-                    else:
-                        metadataDict["inker"] = xmldoc.getElementsByTagName('Inker')[0].firstChild.data
-
-
-                    if len(xmldoc.getElementsByTagName("Letterer")) == 0:
-                        print("no letterer artist found")
-                        metadataDict["letterer"] = 'NULL'
-                    else:
-                        metadataDict["letterer"] = xmldoc.getElementsByTagName('Letterer')[0].firstChild.data
-
-
-                    if len(xmldoc.getElementsByTagName("CoverArtist")) == 0:
-                        print("no cover artist found")
-                        metadataDict["cover artist"] = 'NULL'
-                    else:
-                        metadataDict["cover artist"] = xmldoc.getElementsByTagName('CoverArtist')[0].firstChild.data
-
-
-                    if len(xmldoc.getElementsByTagName("Colorist")) == 0:
-                        print("no colorist found")
-                        metadataDict["colorist"] = 'NULL'
-                    else:
-                        metadataDict["colorist"] = xmldoc.getElementsByTagName('Colorists')[0].firstChild.data
-
-
-                    if len(xmldoc.getElementsByTagName("Editor")) == 0:
-                        print("no editor found")
-                        metadataDict["editor"] = 'NULL'
-                    else:
-                        metadataDict["editor"] = xmldoc.getElementsByTagName('Editor')[0].firstChild.data
-
-
-                    if len(xmldoc.getElementsByTagName("Publisher")) == 0:
-                        print("no publisher found")
-                        metadataDict["publisher"] = 'NULL'
-                    else:
-                        metadataDict["publisher"] = xmldoc.getElementsByTagName('Publisher')[0].firstChild.data
-
-
-                    if len(xmldoc.getElementsByTagName("Web")) == 0:
-                        print("no metadata source found")
-                        metadataDict["metadata source"] = 'NULL'
-                    else:
-                        metadataDict["metadata source"] = xmldoc.getElementsByTagName('Web')[0].firstChild.data
-                        
-
-                    if len(xmldoc.getElementsByTagName("PageCount")) == 0:
-                        print("no pageCount found")
-                        metadataDict["pagecount"] = 'NULL'
-                    else:
-                        metadataDict["page count"] = xmldoc.getElementsByTagName('PageCount')[0].firstChild.data
-
-
-                    if len(xmldoc.getElementsByTagName("Characters")) == 0:
-                        print("no characters found")
-                        metadataDict["characters"] = 'NULL'
-                    else:
-                        metadataDict["characters"] = xmldoc.getElementsByTagName('Characters')[0].firstChild.data
-
-
-                    if len(xmldoc.getElementsByTagName("Locations")) == 0:
-                        print("no locations found")
-                        metadataDict["locations"] = 'NULL'
-                    else:
-                        metadataDict["locations"] = xmldoc.getElementsByTagName('Locations')[0].firstChild.data
-
-                    releaseDate = datetime.datetime(int(year),int(month),int(day))
-                    metadataDict["date"] = releaseDate.strftime("%Y/%m/%d")
-                    # print(metadataDict)
-                    return metadataDict
-            except:
-                print("no ComicInfo.xml found")
+                metadataDict["issueID"] = xmldoc.getElementsByTagName('Notes')[0].firstChild.data.split('[')[1].split(' ')[2].split(']')[0]
+                metadataDict["series"] = xmldoc.getElementsByTagName('Series')[0].firstChild.data
+                metadataDict["number"] = xmldoc.getElementsByTagName('Number')[0].firstChild.data
+                metadataDict["title"] = xmldoc.getElementsByTagName('Title')[0].firstChild.data
+                year = xmldoc.getElementsByTagName('Year')[0].firstChild.data
+                month = xmldoc.getElementsByTagName('Month')[0].firstChild.data
+                day = xmldoc.getElementsByTagName('Day')[0].firstChild.data
+                metadataDict["writer"] = xmldoc.getElementsByTagName('Writer')[0].firstChild.data
+                metadataDict["publisher"] = xmldoc.getElementsByTagName('Publisher')[0].firstChild.data
+                metadataDict["metadata source"] = xmldoc.getElementsByTagName('Web')[0].firstChild.data
+                metadataDict["page count"] = xmldoc.getElementsByTagName('PageCount')[0].firstChild.data
+                metadataDict["characters"] = xmldoc.getElementsByTagName('Characters')[0].firstChild.data
+                metadataDict["locations"] = xmldoc.getElementsByTagName('Locations')[0].firstChild.data
+ 
+ 
+                releaseDate = datetime.datetime(int(year),int(month),int(day))
+                metadataDict["date"] = releaseDate.strftime("%Y/%m/%d")
+ 
+                return metadataDict
     except:
             print("unable to open zip file")
     return metadataDict
 
 
  # need to find a way to determine type
- # need to handle dates
- # need to populate creators
- # need to link the tables
 def populate_database(basePath):
-    listOfFiles = obtainListOfPaths(basePath)    
+    listOfFiles = obtainListOfPaths(basePath)
     con = sqlite3.connect('main.db')
     con.execute("PRAGMA foreign_keys = on")
     cursor = con.cursor()
 
     for path in listOfFiles:
         if path.endswith("cbz"):
-            metadataDict = extractMetadata(path,"ComicInfo.xml")
+           metadataDict = extractMetadata(path,"ComicInfo.xml")
+           print(path)
+           print(metadataDict)
 
-                # cursor.execute('''INSERT OR IGNORE INTO Comics(title, type, series, number, issueID, dateCreated, path) VALUES (?,?,?,?,?,?,?)''', (str(metadataDict["title"]), "issue" ,str(metadataDict["series"]),metadataDict["number"], metadataDict["issueID"],str(metadataDict["date"]),str(path)))
-
-
-            # coverArtists = metadataDict["cover artist"].split(',')
-            # writers = metadataDict["writer"].split(',')
-            # letterers = metadataDict["letterer"].split(',')
-            # pencillers = metadataDict["penciller"].split(',')
-            # editors = metadataDict["editor"].split(',')
-            # inkers = metadataDict["inker"].split(',')
-            # colorists = metadataDict["colorist"].split(',')
-
-            creators = []
-
-            # for item in coverArtists:
-                # temptup = ("Cover Artist", item)
-                # creators.append(temptup)
-
-            # for item in writers:
-                # temptup = ("Writer", item)
-                # creators.append(temptup)
-
-            # for item in letterers:
-                # temptup = ("Letterer",item)
-                # creators.append(temptup)
-
-            # for item in pencillers:
-                # temptup = ("Penciller", item)
-                # creators.append(temptup)
-
-            # for item in editors:
-                # temptup = ("Editor", item)
-                # creators.append(temptup)
-
-            # for item in inkers:
-                # temptup = ("Inker", item)
-                # creators.append(temptup)
-
-            # for item in colorists:
-                # temptup = ("colorist", item)
-                # cursor.execute('''INSERT OR IGNORE INTO creators VALUES(?,?);''',("colorist", str(item)))
-                # creators.append(temptup)
-
-
-            cursor.executemany('''INSERT OR IGNORE INTO creators(position, name) VALUES (?,?);''', creators)
-            con.commit()
-
+           cursor.execute('''INSERT OR IGNORE INTO Comics(title, type, series, number, issueID,\
+                             dateCreated, writer, path) VALUES (?,?,?,?,?,?,?,?)''',
+                             (metadataDict.setdefault("title", "NULL"),
+                             "issue",
+                             metadataDict.setdefault("series","NULL"),
+                             metadataDict.setdefault("number","NULL"),
+                             metadataDict.setdefault("issueID","NULL"),
+                             metadataDict.setdefault("date","NULL"),
+                             metadataDict.setdefault("writer","NULL"),
+                             path))
+           con.commit()
 
 
 def create_database():
@@ -240,7 +88,6 @@ def create_database():
     con.execute("PRAGMA foreign_keys = on")
     cursor = con.cursor()
 
-    # add path
     # creates Comics table
     cursor.execute("CREATE TABLE IF NOT EXISTS 'comics' ( \
 	    'id'	    INTEGER NOT NULL, \
@@ -250,26 +97,9 @@ def create_database():
 	    'number'	    INTEGER, \
 	    'issueID'	    INTEGER, \
 	    'dateCreated'   TEXT, \
+	    'writer'   TEXT, \
             'path'          TEXT, \
 	    PRIMARY KEY('id' AUTOINCREMENT) \
-    );")
-
-    # creates Creators table
-    cursor.execute("CREATE TABLE  IF NOT EXISTS 'creators' ( \
-	    'id'	        INTEGER NOT NULL, \
-	    'name'	        TEXT, \
-	    'position'	    TEXT, \
-	    PRIMARY KEY('id' AUTOINCREMENT) \
-    );")
-
-    # creates CreatorComics table
-    cursor.execute("CREATE TABLE IF NOT EXISTS 'creatorComics' ( \
-	    'id'	        INTEGER NOT NULL, \
-	    'comicID'	    INTEGER, \
-	    'creatorID'	    INTEGER, \
-	    FOREIGN KEY('comicID') REFERENCES 'comics'('id'), \
-	    PRIMARY KEY('id' AUTOINCREMENT), \
-	    FOREIGN KEY('creatorID') REFERENCES 'creators'('id') \
     );")
 
     con.commit()
@@ -277,10 +107,6 @@ def create_database():
 
 def main():
     create_database()
-    tempPath = "/home/gianni/Documents/code/python/comicbooks/Batman Damned (1-3)/Batman_ Damned #1 - Brian Azzarello.cbz"
-    # test  = extractMetadata(tempPath, "ComicInfo.xml")
-    # print(test)
-    populate_database("/home/gianni/.comicOrchard/main")
 
 
 if __name__ == "__main__":

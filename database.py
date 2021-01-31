@@ -28,33 +28,41 @@ def extractMetadata(path, filename):
     year = 0
     day = 0
     month = 0
-    try:
-        with zipfile.ZipFile(path) as zip_file:
-            with zip_file.open(filename) as f:
-                xmldoc = minidom.parse(f)
+    with zipfile.ZipFile(path) as zip_file:
+        with zip_file.open(filename) as f:
+            xmldoc = minidom.parse(f)
+ 
+            metadataDict["issueID"] = xmldoc.getElementsByTagName('Notes')[0].firstChild.data.split('[')[1].split(' ')[2].split(']')[0]
+            metadataDict["series"] = xmldoc.getElementsByTagName('Series')[0].firstChild.data
+            metadataDict["number"] = xmldoc.getElementsByTagName('Number')[0].firstChild.data
+            metadataDict["publisher"] = xmldoc.getElementsByTagName('Publisher')[0].firstChild.data
+            metadataDict["metadata source"] = xmldoc.getElementsByTagName('Web')[0].firstChild.data
+            metadataDict["page count"] = xmldoc.getElementsByTagName('PageCount')[0].firstChild.data
 
-                metadataDict["issueID"] = xmldoc.getElementsByTagName('Notes')[0].firstChild.data.split('[')[1].split(' ')[2].split(']')[0]
-                metadataDict["series"] = xmldoc.getElementsByTagName('Series')[0].firstChild.data
-                metadataDict["number"] = xmldoc.getElementsByTagName('Number')[0].firstChild.data
+            if len(xmldoc.getElementsByTagName('Title')) != 0:
                 metadataDict["title"] = xmldoc.getElementsByTagName('Title')[0].firstChild.data
-                year = xmldoc.getElementsByTagName('Year')[0].firstChild.data
-                month = xmldoc.getElementsByTagName('Month')[0].firstChild.data
-                day = xmldoc.getElementsByTagName('Day')[0].firstChild.data
+ 
+
+            if len(xmldoc.getElementsByTagName('Writer')) != 0:
                 metadataDict["writer"] = xmldoc.getElementsByTagName('Writer')[0].firstChild.data
-                metadataDict["publisher"] = xmldoc.getElementsByTagName('Publisher')[0].firstChild.data
-                metadataDict["metadata source"] = xmldoc.getElementsByTagName('Web')[0].firstChild.data
-                metadataDict["page count"] = xmldoc.getElementsByTagName('PageCount')[0].firstChild.data
+ 
+ 
+            if len(xmldoc.getElementsByTagName('Characters')) != 0:
                 metadataDict["characters"] = xmldoc.getElementsByTagName('Characters')[0].firstChild.data
+ 
+ 
+            if len(xmldoc.getElementsByTagName('Locations')) != 0:
                 metadataDict["locations"] = xmldoc.getElementsByTagName('Locations')[0].firstChild.data
  
  
-                releaseDate = datetime.datetime(int(year),int(month),int(day))
-                metadataDict["date"] = releaseDate.strftime("%Y/%m/%d")
+            year = xmldoc.getElementsByTagName('Year')[0].firstChild.data
+            month = xmldoc.getElementsByTagName('Month')[0].firstChild.data
+            day = xmldoc.getElementsByTagName('Day')[0].firstChild.data
+
+            releaseDate = datetime.datetime(int(year),int(month),int(day))
+            metadataDict["date"] = releaseDate.strftime("%Y/%m/%d")
  
-                return metadataDict
-    except:
-            print("unable to open zip file")
-    return metadataDict
+            return metadataDict
 
 
  # need to find a way to determine type
@@ -67,8 +75,6 @@ def populate_database(basePath):
     for path in listOfFiles:
         if path.endswith("cbz"):
            metadataDict = extractMetadata(path,"ComicInfo.xml")
-           print(path)
-           print(metadataDict)
 
            cursor.execute('''INSERT OR IGNORE INTO Comics(title, type, series, number, issueID,\
                              dateCreated, writer, path) VALUES (?,?,?,?,?,?,?,?)''',

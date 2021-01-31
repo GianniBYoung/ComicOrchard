@@ -2,12 +2,12 @@ import sqlite3
 import subprocess
 import os
 import datetime
-import zipfile 
+import zipfile
 import shutil
 from xml.dom import minidom
-from pathlib import Path
 
 libraryPath = "/home/gianni/.comicOrchard/main/"
+
 
 def obtainListOfPaths(path):
     listOfFiles = list()
@@ -51,13 +51,11 @@ def addComic(source):
     copyComic(source, destination)
     populate_database(destination)
 
-
-
 def openComicForReading(path):
     subprocess.call(['mcomix', path])
 
 
-#returns a dictionary with metadata where the filename is the metadata file
+# returns a dictionary with metadata where the filename is the metadata file
 def extractMetadata(path, filename):
     metadataDict ={}
     year = 0
@@ -107,19 +105,21 @@ def populate_database(basePath):
 
     for path in listOfFiles:
         if path.endswith("cbz"):
-           metadataDict = extractMetadata(path,"ComicInfo.xml")
+            metadataDict = extractMetadata(path, "ComicInfo.xml")
 
-           cursor.execute('''INSERT OR IGNORE INTO Comics(title, type, series, number, issueID,\
+            cursor.execute('''INSERT OR IGNORE INTO Comics(title, type, series, number, issueID,\
                              dateCreated, writer, path) VALUES (?,?,?,?,?,?,?,?)''',
-                             (metadataDict.setdefault("title", "NULL"),
-                             "issue",
-                             metadataDict.setdefault("series","NULL"),
-                             metadataDict.setdefault("number","NULL"),
-                             metadataDict.setdefault("issueID","NULL"),
-                             metadataDict.setdefault("date","NULL"),
-                             metadataDict.setdefault("writer","NULL"),
-                             path))
-           con.commit()
+                           (metadataDict.setdefault("title", "NULL"),
+                            "issue",
+                            metadataDict.setdefault("series", "NULL"),
+                            metadataDict.setdefault("number", "NULL"),
+                            metadataDict.setdefault("issueID", "NULL"),
+                            metadataDict.setdefault("date", "NULL"),
+                            metadataDict.setdefault("writer", "NULL"),
+                            path))
+            con.commit()
+
+    con.close()
 
 
 def create_database():
@@ -142,6 +142,7 @@ def create_database():
     );")
 
     con.commit()
+    con.close()
 
 
 def query_database(query):
@@ -163,6 +164,8 @@ def insert_comic(title, type, series, number, issueID, dateCreated, writer, path
         "INSERT INTO comics(title, type, series, number, issueID, dateCreated, writer, path) \
         Values (?, ?, ?, ?, ?, ?, ?, ?)", (title, type, series, number, issueID, dateCreated, writer, path))
     con.commit()
+    con.close()
+    cursor.close()
 
 
 def clear_database():
@@ -175,6 +178,8 @@ def clear_database():
         UPDATE SQLITE_SEQUENCE SET SEQ=0 WHERE NAME='comics';"
     )
     con.commit()
+    con.close()
+    cursor.close()
 
 
 def get_all_comic_info():
@@ -184,12 +189,22 @@ def get_all_comic_info():
     return comicList
 
 
+def search(text):
+    con = sqlite3.connect('main.db')
+    con.execute("PRAGMA foreign_keys = on")
+    cursor = con.cursor()
+    cursor.execute(
+        "SELECT * FROM comics WHERE title LIKE ? OR type LIKE ? OR series LIKE ? OR number LIKE ? OR issueID LIKE "
+        "? OR dateCreated LIKE ? OR writer LIKE ? OR path LIKE ?",
+        ('%' + str(text) + '%', '%' + str(text) + '%', '%' + str(text) + '%', '%' + str(text) + '%',
+         '%' + str(text) + '%', '%' + str(text) + '%', '%' + str(text) + '%', '%' + str(text) + '%')
+    )
+    return cursor.fetchall()
+
+
 def main():
     create_database()
     populate_database("/home/gianni/.comicOrchard/main")
-    #addComic("/home/gianni/.comicOrchard/Batman Damned (1-3)")
-    #obtainListOfPaths("/home/gianni/.comicOrchard/Batman Damned (1-3)/Batman_ Damned #1 - Brian Azzarello.cbz")
-
 
 if __name__ == "__main__":
     main()

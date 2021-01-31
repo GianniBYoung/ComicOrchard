@@ -130,6 +130,7 @@ def import_comics():
 
 def main():
     root = tk.Tk()
+    root.geometry("2000x1000")
     root.title('Comic Orchard')
     root.eval('tk::PlaceWindow . center')
     create_tool_bar(root)

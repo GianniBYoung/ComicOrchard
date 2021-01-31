@@ -49,6 +49,7 @@ def create_table(root):
     root.treeview = tv
     tv.tag_configure('odd', background='#272626')
     tv.tag_configure('even', background='#2d2d2d')
+    tv.heading("#0", command=lambda: treeview_sort_column(tv, "#0", False))
     for col in columns:
         tv.heading(col, command=lambda _col=col:
         treeview_sort_column(tv, _col, False))
@@ -86,16 +87,13 @@ class HoverButton(tk.Button):
 
 # Sorts table when clicking on columns
 def treeview_sort_column(tv, col, reverse):
-    l = [(tv.set(k, col), k) for k in tv.get_children('')]
-    l.sort(reverse=reverse)
+    l = [(tv.item(k)["text"], k) for k in tv.get_children()]
+    l.sort(key=lambda t: t[0], reverse=reverse)
 
-    # rearrange items in sorted positions
     for index, (val, k) in enumerate(l):
         tv.move(k, '', index)
 
-    # reverse sort next time
-    tv.heading(col, command=lambda:
-    treeview_sort_column(tv, col, not reverse))
+    tv.heading(col, command=lambda: treeview_sort_column(tv, col, not reverse))
 
 
 # Populates table with all current data

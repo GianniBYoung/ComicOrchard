@@ -55,9 +55,13 @@ class App(Frame):
         self.master.treeview = tv
         tv.tag_configure('odd', background='#272626')
         tv.tag_configure('even', background='#2d2d2d')
-        tv.heading("#0", command=lambda: treeview_sort_column(tv, "#0", False))
+
+        # Sets up the sorting for clicking the columns - number columns are sorted differently
         for col in columns:
             tv.heading(col, command=lambda _col=col: treeview_sort_column(tv, _col, False))
+        tv.heading("#0", command=lambda: treeview_sort_first_column(tv, "#0", False))
+        tv.heading("number", command=lambda: treeview_sort_number_column(tv, "number", False))
+        tv.heading("issueID", command=lambda: treeview_sort_number_column(tv, "issueID", False))
 
     # Method for double clicking a comic
     def on_double_click(self, e):
@@ -93,13 +97,35 @@ class HoverButton(tk.Button):
 
 # Sorts table when clicking on columns - https://stackoverflow.com/questions/55268613/python-tkinter-treeview-sort-tree
 def treeview_sort_column(tv, col, reverse):
+    l = [(tv.set(k, col), k) for k in tv.get_children('')]
+    l.sort(reverse=reverse)
+
+    for index, (val, k) in enumerate(l):
+        tv.move(k, '', index)
+
+    tv.heading(col, command=lambda: treeview_sort_column(tv, col, not reverse))
+
+
+def treeview_sort_first_column(tv, col, reverse):
     l = [(tv.item(k)["text"], k) for k in tv.get_children()]
     l.sort(key=lambda t: t[0], reverse=reverse)
 
     for index, (val, k) in enumerate(l):
         tv.move(k, '', index)
 
-    tv.heading(col, command=lambda: treeview_sort_column(tv, col, not reverse))
+    tv.heading(col, command=lambda: treeview_sort_first_column(tv, col, not reverse))
+
+
+def treeview_sort_number_column(tv, col, reverse):
+    l = [(tv.set(k, col), k) for k in tv.get_children('')]
+    l.sort(key=lambda t: int(t[0]), reverse=reverse)
+    #      ^^^^^^^^^^^^^^^^^^^^^^^
+
+    for index, (val, k) in enumerate(l):
+        tv.move(k, '', index)
+
+    tv.heading(col,
+               command=lambda: treeview_sort_number_column(tv, col, not reverse))
 
 
 # Populates table with all current data

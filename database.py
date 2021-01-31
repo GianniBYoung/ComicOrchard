@@ -116,6 +116,9 @@ def populate_database(basePath):
                              path))
            con.commit()
 
+    con.close()
+    cursor.close()
+
 
 def create_database():
     con = sqlite3.connect('main.db')
@@ -137,7 +140,8 @@ def create_database():
     );")
 
     con.commit()
-
+    con.close()
+    cursor.close()
 
 def query_database(query):
     con = sqlite3.connect('main.db')
@@ -158,6 +162,8 @@ def insert_comic(title, type, series, number, issueID, dateCreated, writer, path
         "INSERT INTO comics(title, type, series, number, issueID, dateCreated, writer, path) \
         Values (?, ?, ?, ?, ?, ?, ?, ?)", (title, type, series, number, issueID, dateCreated, writer, path))
     con.commit()
+    con.close()
+    cursor.close()
 
 
 def clear_database():
@@ -170,6 +176,8 @@ def clear_database():
         UPDATE SQLITE_SEQUENCE SET SEQ=0 WHERE NAME='comics';"
     )
     con.commit()
+    con.close()
+    cursor.close()
 
 
 def get_all_comic_info():
@@ -177,6 +185,19 @@ def get_all_comic_info():
         'SELECT * FROM comics'
     )
     return comicList
+
+
+def search(text):
+    con = sqlite3.connect('main.db')
+    con.execute("PRAGMA foreign_keys = on")
+    cursor = con.cursor()
+    cursor.execute(
+        "SELECT * FROM comics WHERE title LIKE ? OR type LIKE ? OR series LIKE ? OR number LIKE ? OR issueID LIKE "
+        "? OR dateCreated LIKE ? OR writer LIKE ? OR path LIKE ?",
+        ('%' + str(text) + '%', '%' + str(text) + '%', '%' + str(text) + '%', '%' + str(text) + '%',
+         '%' + str(text) + '%', '%' + str(text) + '%', '%' + str(text) + '%', '%' + str(text) + '%')
+    )
+    return cursor.fetchall()
 
 
 def main():

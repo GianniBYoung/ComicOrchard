@@ -5,7 +5,7 @@ import database
 
 
 # Creates table for comic book info - https://stackoverflow.com/questions/22456445/how-to-imitate-this-table-using-tkinter
-class App(Frame):
+class Table(Frame):
     def __init__(self, parent):
         Frame.__init__(self, parent)
         self.create_table()
@@ -70,14 +70,55 @@ class App(Frame):
         database.openComicForReading(comicPath)
 
 
-# Creates toolbar with buttons at the top
-def create_tool_bar(root):
-    toolbar = tk.Frame(root, bg="#272626")
-    btnAddComic = HoverButton(root, text="Add Comic", activebackground="#C9C9C9", command=add_comic)
-    btnAddComic.pack(in_=toolbar, side=tk.LEFT)
-    btnImportComics = HoverButton(root, text="Import Comics", activebackground="#C9C9C9", command=import_comics)
-    btnImportComics.pack(in_=toolbar, side=tk.LEFT)
-    toolbar.pack(fill=tk.X)
+class Toolbar(Frame):
+    def __init__(self, parent):
+        Frame.__init__(self, parent)
+        self.create_toolbar()
+
+    # Creates toolbar with buttons at the top
+    def create_toolbar(self):
+        toolbar = tk.Frame(self.master, bg="#272626")
+        btnAddComic = HoverButton(self.master, text="Add Comic", activebackground="#C9C9C9", command=add_comic)
+        btnAddComic.pack(in_=toolbar, side=tk.LEFT)
+        btnImportComics = HoverButton(self.master, text="Import Comics", activebackground="#C9C9C9", command=import_comics)
+        btnImportComics.pack(in_=toolbar, side=tk.LEFT, padx=5)
+        searchLabel = tk.Label(self.master, text="Search: ", bg="#272626", fg="white", font=("Times New Roman", 13))
+        searchLabel.pack(in_=toolbar, side=tk.LEFT, padx=5)
+        searchEntry = tk.Entry(self.master, width=45, bd=5)
+        searchEntry.pack(in_=toolbar, side=tk.LEFT)
+        searchEntry.bind('<Return>', self.search)
+        btnReset = HoverButton(self.master, text="Reset Search", activebackground="#C9C9C9", command=self.reset)
+        btnReset.pack(in_=toolbar, side=tk.LEFT, padx=5)
+        self.master.entry = searchEntry
+        toolbar.pack(fill=tk.X)
+
+    def search(self, event):
+        searchText = self.master.entry.get()
+        if searchText != "":
+            self.master.treeview.delete(*self.master.treeview.get_children())
+        results = database.search(searchText)
+        count = 1
+        for data in results:
+            if count % 2 == 0:
+                tag = "even"
+            else:
+                tag = "odd"
+            self.master.treeview.insert('', 'end', text=count, values=(data[1], data[2], data[3], data[4], data[5],
+                                                           data[6], data[7], data[8]), tags=tag)
+            count += 1
+
+    def reset(self):
+        self.master.treeview.delete(*self.master.treeview.get_children())
+        results = database.get_all_comic_info()
+        count = 1
+        for data in results:
+            if count % 2 == 0:
+                tag = "even"
+            else:
+                tag = "odd"
+            self.master.treeview.insert('', 'end', text=count, values=(data[1], data[2], data[3], data[4], data[5],
+                                                                       data[6], data[7], data[8]), tags=tag)
+            count += 1
 
 
 # button class to customize hover color - https://stackoverflow.com/questions/49888623/tkinter-hovering-over-button-color-change
@@ -106,6 +147,7 @@ def treeview_sort_column(tv, col, reverse):
     tv.heading(col, command=lambda: treeview_sort_column(tv, col, not reverse))
 
 
+# Sorts table when clicking on the first column
 def treeview_sort_first_column(tv, col, reverse):
     l = [(tv.item(k)["text"], k) for k in tv.get_children()]
     l.sort(key=lambda t: t[0], reverse=reverse)
@@ -116,6 +158,7 @@ def treeview_sort_first_column(tv, col, reverse):
     tv.heading(col, command=lambda: treeview_sort_first_column(tv, col, not reverse))
 
 
+# Sorts table when clicking on a column of numbers - https://stackoverflow.com/questions/22032152/python-ttk-treeview-sort-numbers
 def treeview_sort_number_column(tv, col, reverse):
     l = [(tv.set(k, col), k) for k in tv.get_children('')]
     l.sort(key=lambda t: int(t[0]), reverse=reverse)
@@ -163,8 +206,8 @@ def main():
     root.geometry("2000x1000")
     root.title('Comic Orchard')
     root.eval('tk::PlaceWindow . center')
-    create_tool_bar(root)
-    App(root)
+    Toolbar(root)
+    Table(root)
     populate_table(root)
     root.mainloop()
 

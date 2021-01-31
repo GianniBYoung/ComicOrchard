@@ -190,12 +190,14 @@ def add_comic():
                                           filetypes=[("Comic Book Zips",
                                                       "*.cbz*")])
     database.addComic(filename)
+    Toolbar.reset()
 
 
 # button click to import comics
 def import_comics():
     filename = filedialog.askdirectory()
     database.addComics(filename)
+    Toolbar.reset()
 
 
 def main():

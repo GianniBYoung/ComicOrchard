@@ -75,9 +75,9 @@ class Toolbar(Frame):
     # Creates toolbar with buttons at the top
     def create_toolbar(self):
         toolbar = tk.Frame(self.master, bg="#272626")
-        btnAddComic = HoverButton(self.master, text="Add Comic", activebackground="#C9C9C9", command=add_comic)
+        btnAddComic = HoverButton(self.master, text="Add Comic", activebackground="#C9C9C9", command=self.add_comic)
         btnAddComic.pack(in_=toolbar, side=tk.LEFT)
-        btnImportComics = HoverButton(self.master, text="Import Comics", activebackground="#C9C9C9", command=import_comics)
+        btnImportComics = HoverButton(self.master, text="Import Comics", activebackground="#C9C9C9", command=self.import_comics)
         btnImportComics.pack(in_=toolbar, side=tk.LEFT, padx=5)
         btnDeleteRows = HoverButton(self.master, text="Delete Selected Rows", activebackground="#C9C9C9", command=self.delete_selected_rows)
         btnDeleteRows.pack(in_=toolbar, side=tk.LEFT, padx=5)
@@ -126,6 +126,21 @@ class Toolbar(Frame):
         for selected_item in selected_items:
             database.delete_selected_row(self.master.treeview.item(selected_item)['values'][0])
             self.master.treeview.delete(selected_item)
+
+    # Button click to add comic - https://www.geeksforgeeks.org/file-explorer-in-python-using-tkinter/
+    def add_comic(self):
+        filename = filedialog.askopenfilename(initialdir="~",
+                                              title="Select a File",
+                                              filetypes=[("Comic Book Zips",
+                                                          "*.cbz*")])
+        database.addComic(filename)
+        self.refresh()
+
+    # button click to import comics
+    def import_comics(self):
+        filename = filedialog.askdirectory()
+        database.addComics(filename)
+        self.refresh()
 
 
 # button class to customize hover color - https://stackoverflow.com/questions/49888623/tkinter-hovering-over-button-color-change
@@ -189,23 +204,6 @@ def populate_table(self):
         self.treeview.insert('', 'end', text=comic[0], values=(comic[1], comic[2], comic[3], comic[4], comic[5],
                                                                comic[6], comic[7], comic[8]), tags=tag)
         count += 1
-
-
-# Button click to add comic - https://www.geeksforgeeks.org/file-explorer-in-python-using-tkinter/
-def add_comic():
-    filename = filedialog.askopenfilename(initialdir="~",
-                                          title="Select a File",
-                                          filetypes=[("Comic Book Zips",
-                                                      "*.cbz*")])
-    database.addComic(filename)
-    Toolbar.reset()
-
-
-# button click to import comics
-def import_comics():
-    filename = filedialog.askdirectory()
-    database.addComics(filename)
-    Toolbar.reset()
 
 
 def main():

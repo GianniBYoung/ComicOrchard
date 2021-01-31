@@ -22,7 +22,7 @@ def create_table(root):
     tv.configure(xscrollcommand=scrollbar.set)
     tv.pack(fill=tk.BOTH, expand=True)
     tv.bind("<<TreeviewSelect>>", on_double_click)
-    columns = ('title', 'type', 'series', 'number', 'issueID', 'date', 'writer')
+    columns = ('title', 'type', 'series', 'number', 'issueID', 'date', 'writer', 'path')
     tv['columns'] = columns
     tv.heading("#0", text='')
     tv.column("#0", anchor="w")
@@ -40,6 +40,8 @@ def create_table(root):
     tv.column('date', anchor='w', width=100)
     tv.heading('writer', text='Writer')
     tv.column('writer', anchor='w', width=200)
+    tv.heading('path', text='Path')
+    tv.column('path', anchor='w', width=200)
     root.treeview = tv
     tv.tag_configure('odd', background='#272626')
     tv.tag_configure('even', background='#2d2d2d')
@@ -56,11 +58,14 @@ def on_double_click(event):
 # Creates toolbar with buttons at the top
 def create_tool_bar(root):
     toolbar = tk.Frame(root, bg="#272626")
-    classButton = HoverButton(root, text="Add Comic", activebackground="#C9C9C9", command=browseFiles)
-    classButton.pack(in_=toolbar, side=tk.LEFT)
+    btnAddComic = HoverButton(root, text="Add Comic", activebackground="#C9C9C9", command=add_comic)
+    btnAddComic.pack(in_=toolbar, side=tk.LEFT)
+    btnImportComics = HoverButton(root, text="Import Comics", activebackground="#C9C9C9", command=import_comics)
+    btnImportComics.pack(in_=toolbar, side=tk.LEFT)
     toolbar.pack(fill=tk.X)
 
 
+# button class to customize hover color
 class HoverButton(tk.Button):
     def __init__(self, master, **kw):
         tk.Button.__init__(self, master=master, **kw)
@@ -89,11 +94,6 @@ def treeview_sort_column(tv, col, reverse):
     treeview_sort_column(tv, col, not reverse))
 
 
-# Button click to add comic
-def add_comic():
-    print("hello")
-
-
 # Populates table with all current data
 def populate_table(self):
     singleComics = database.get_all_comic_info()
@@ -105,15 +105,24 @@ def populate_table(self):
         else:
             tag = "odd"
         self.treeview.insert('', 'end', text=comic[0], values=(comic[1], comic[2], comic[3], comic[4], comic[5],
-                                                               comic[6], comic[7]), tags=tag)
+                                                               comic[6], comic[7], comic[8]), tags=tag)
         count += 1
 
 
-def browseFiles():
+# Button click to add comic
+def add_comic():
     filename = filedialog.askopenfilename(initialdir="/",
                                           title="Select a File",
                                           filetypes=[("Comic Book Zips",
                                                      "*.cbz*")])
+
+
+# button click to import comics
+def import_comics():
+    filename = filedialog.askopenfilename(initialdir="/",
+                                          title="Select a File",
+                                          filetypes=[("Comic Book Zips",
+                                                      "*.cbz*")])
 
 def main():
     root = tk.Tk()

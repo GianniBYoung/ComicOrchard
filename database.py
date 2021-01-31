@@ -133,14 +133,14 @@ def query_database(query):
     return cursor.fetchall()
 
 
-def insert_comic(title, type, series, number, issueID, dateCreated, writer):
+def insert_comic(title, type, series, number, issueID, dateCreated, writer, path):
     con = sqlite3.connect('main.db')
     con.execute("PRAGMA foreign_keys = on")
     cursor = con.cursor()
 
     cursor.execute(
-        "INSERT INTO comics(title, type, series, number, issueID, dateCreated, writer) \
-        Values (?, ?, ?, ?, ?, ?, ?)", (title, type, series, number, issueID, dateCreated, writer))
+        "INSERT INTO comics(title, type, series, number, issueID, dateCreated, writer, path) \
+        Values (?, ?, ?, ?, ?, ?, ?, ?)", (title, type, series, number, issueID, dateCreated, writer, path))
     con.commit()
 
 

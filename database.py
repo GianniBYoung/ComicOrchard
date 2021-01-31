@@ -131,6 +131,46 @@ def create_database():
     con.commit()
 
 
+def query_database(query):
+    con = sqlite3.connect('main.db')
+    con.execute("PRAGMA foreign_keys = on")
+    cursor = con.cursor()
+    cursor.execute(query)
+
+    con.commit()
+    return cursor.fetchall()
+
+
+def insert_comic(title, type, series, number, issueID, dateCreated, writer, path):
+    con = sqlite3.connect('main.db')
+    con.execute("PRAGMA foreign_keys = on")
+    cursor = con.cursor()
+
+    cursor.execute(
+        "INSERT INTO comics(title, type, series, number, issueID, dateCreated, writer, path) \
+        Values (?, ?, ?, ?, ?, ?, ?, ?)", (title, type, series, number, issueID, dateCreated, writer, path))
+    con.commit()
+
+
+def clear_database():
+    con = sqlite3.connect('main.db')
+    con.execute("PRAGMA foreign_keys = on")
+    cursor = con.cursor()
+
+    cursor.executescript(
+        "DELETE FROM comics;\
+        UPDATE SQLITE_SEQUENCE SET SEQ=0 WHERE NAME='comics';"
+    )
+    con.commit()
+
+
+def get_all_comic_info():
+    comicList = query_database(
+        'SELECT * FROM comics'
+    )
+    return comicList
+
+
 def main():
     create_database()
     #populate_database("/home/gianni/.comicOrchard/main")

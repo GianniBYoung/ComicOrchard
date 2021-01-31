@@ -79,12 +79,14 @@ class Toolbar(Frame):
         btnAddComic.pack(in_=toolbar, side=tk.LEFT)
         btnImportComics = HoverButton(self.master, text="Import Comics", activebackground="#C9C9C9", command=import_comics)
         btnImportComics.pack(in_=toolbar, side=tk.LEFT, padx=5)
+        btnDeleteRows = HoverButton(self.master, text="Delete Selected Rows", activebackground="#C9C9C9", command=self.delete_selected_rows)
+        btnDeleteRows.pack(in_=toolbar, side=tk.LEFT, padx=5)
         searchLabel = tk.Label(self.master, text="Search: ", bg="#272626", fg="white", font=("Times New Roman", 13))
         searchLabel.pack(in_=toolbar, side=tk.LEFT, padx=5)
         searchEntry = tk.Entry(self.master, width=45, bd=5)
         searchEntry.pack(in_=toolbar, side=tk.LEFT)
         searchEntry.bind('<Return>', self.search)
-        btnReset = HoverButton(self.master, text="Reset Search", activebackground="#C9C9C9", command=self.reset)
+        btnReset = HoverButton(self.master, text="Refresh", activebackground="#C9C9C9", command=self.refresh)
         btnReset.pack(in_=toolbar, side=tk.LEFT, padx=5)
         self.master.entry = searchEntry
         toolbar.pack(fill=tk.X)
@@ -106,7 +108,7 @@ class Toolbar(Frame):
             count += 1
 
     # Reset table to before the search
-    def reset(self):
+    def refresh(self):
         self.master.treeview.delete(*self.master.treeview.get_children())
         results = database.get_all_comic_info()
         count = 1
@@ -118,6 +120,12 @@ class Toolbar(Frame):
             self.master.treeview.insert('', 'end', text=count, values=(data[1], data[2], data[3], data[4], data[5],
                                                                        data[6], data[7], data[8]), tags=tag)
             count += 1
+
+    def delete_selected_rows(self):
+        selected_items = self.master.treeview.selection()
+        for selected_item in selected_items:
+            database.delete_selected_row(self.master.treeview.item(selected_item)['values'][0])
+            self.master.treeview.delete(selected_item)
 
 
 # button class to customize hover color - https://stackoverflow.com/questions/49888623/tkinter-hovering-over-button-color-change

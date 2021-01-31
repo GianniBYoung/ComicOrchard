@@ -4,60 +4,66 @@ from tkinter import ttk, filedialog
 import database
 
 
-# Creates table for comic book info
-def create_table(root):
-    tableFrame = Frame(root)
-    tableFrame.pack(fill=tk.BOTH, expand=True)
+# Creates table for comic book info - https://stackoverflow.com/questions/22456445/how-to-imitate-this-table-using-tkinter
+class App(Frame):
+    def __init__(self, parent):
+        Frame.__init__(self, parent)
+        self.create_table()
 
-    style = ttk.Style()
-    style.configure("mystyle.Treeview", fieldbackground="#2d2d2d", foreground="white", highlightthickness=0, bd=0,
-                    font=('Times New Roman', 11))
-    style.configure("mystyle.Treeview.Heading", foreground="white", background="#4c4c4c", font=('Times New Roman', 13))
+    def create_table(self):
+        tableFrame = Frame(self.master)
+        tableFrame.pack(fill=tk.BOTH, expand=True)
 
-    scrollbar = tk.Scrollbar(tableFrame,
-                          orient="vertical",
-                          bg="#C9C9C9",
-                          activebackground="#B7B7B7")
-    scrollbar.pack(side='right', fill=tk.Y)
+        style = ttk.Style()
+        style.configure("mystyle.Treeview", fieldbackground="#2d2d2d", foreground="white", highlightthickness=0, bd=0,
+                        font=('Times New Roman', 11))
+        style.configure("mystyle.Treeview.Heading", foreground="white", background="#4c4c4c",
+                        font=('Times New Roman', 13))
 
-    tv = Treeview(tableFrame, style="mystyle.Treeview", yscrollcommand=scrollbar.set)
-    scrollbar.config(command=tv.yview)
+        scrollbar = tk.Scrollbar(tableFrame,
+                                 orient="vertical",
+                                 bg="#C9C9C9",
+                                 activebackground="#B7B7B7")
+        scrollbar.pack(side='right', fill=tk.Y)
 
-    tv.configure(xscrollcommand=scrollbar.set)
-    tv.pack(fill=tk.BOTH, expand=True)
-    tv.bind("<<TreeviewSelect>>", on_double_click)
-    columns = ('title', 'type', 'series', 'number', 'issueID', 'date', 'writer', 'path')
-    tv['columns'] = columns
-    tv.heading("#0", text='')
-    tv.column("#0", anchor="w")
-    tv.heading('title', text='Title', anchor='center')
-    tv.column('title', anchor="w")
-    tv.heading('type', text='Type')
-    tv.column('type', anchor='w', width=100)
-    tv.heading('series', text='Series')
-    tv.column('series', anchor='w', width=200)
-    tv.heading('number', text='Number')
-    tv.column('number', anchor='w', width=200)
-    tv.heading('issueID', text='IssueID')
-    tv.column('issueID', anchor='w', width=200)
-    tv.heading('date', text='Date')
-    tv.column('date', anchor='w', width=100)
-    tv.heading('writer', text='Writer')
-    tv.column('writer', anchor='w', width=200)
-    tv.heading('path', text='Path')
-    tv.column('path', anchor='w', width=200)
-    root.treeview = tv
-    tv.tag_configure('odd', background='#272626')
-    tv.tag_configure('even', background='#2d2d2d')
-    tv.heading("#0", command=lambda: treeview_sort_column(tv, "#0", False))
-    for col in columns:
-        tv.heading(col, command=lambda _col=col:
-        treeview_sort_column(tv, _col, False))
+        tv = Treeview(tableFrame, style="mystyle.Treeview", yscrollcommand=scrollbar.set)
+        scrollbar.config(command=tv.yview)
 
+        tv.configure(xscrollcommand=scrollbar.set)
+        tv.pack(fill=tk.BOTH, expand=True)
+        tv.bind("<<TreeviewSelect>>", self.on_double_click)
+        columns = ('title', 'type', 'series', 'number', 'issueID', 'date', 'writer', 'path')
+        tv['columns'] = columns
+        tv.heading("#0", text='')
+        tv.column("#0", anchor="w")
+        tv.heading('title', text='Title', anchor='center')
+        tv.column('title', anchor="w")
+        tv.heading('type', text='Type')
+        tv.column('type', anchor='w', width=100)
+        tv.heading('series', text='Series')
+        tv.column('series', anchor='w', width=200)
+        tv.heading('number', text='Number')
+        tv.column('number', anchor='w', width=200)
+        tv.heading('issueID', text='IssueID')
+        tv.column('issueID', anchor='w', width=200)
+        tv.heading('date', text='Date')
+        tv.column('date', anchor='w', width=100)
+        tv.heading('writer', text='Writer')
+        tv.column('writer', anchor='w', width=200)
+        tv.heading('path', text='Path')
+        tv.column('path', anchor='w', width=200)
+        self.master.treeview = tv
+        tv.tag_configure('odd', background='#272626')
+        tv.tag_configure('even', background='#2d2d2d')
+        tv.heading("#0", command=lambda: treeview_sort_column(tv, "#0", False))
+        for col in columns:
+            tv.heading(col, command=lambda _col=col: treeview_sort_column(tv, _col, False))
 
-# Method for double clicking a comic
-def on_double_click(event):
-    print("hello")
+    # Method for double clicking a comic
+    def on_double_click(self, e):
+        item = self.master.treeview.item(self.master.treeview.focus())
+        comicPath = item['values'][7]
+        database.openComicForReading(comicPath)
 
 
 # Creates toolbar with buttons at the top
@@ -70,7 +76,7 @@ def create_tool_bar(root):
     toolbar.pack(fill=tk.X)
 
 
-# button class to customize hover color
+# button class to customize hover color - https://stackoverflow.com/questions/49888623/tkinter-hovering-over-button-color-change
 class HoverButton(tk.Button):
     def __init__(self, master, **kw):
         tk.Button.__init__(self, master=master, **kw)
@@ -85,7 +91,7 @@ class HoverButton(tk.Button):
         self['background'] = self.defaultBackground
 
 
-# Sorts table when clicking on columns
+# Sorts table when clicking on columns - https://stackoverflow.com/questions/55268613/python-tkinter-treeview-sort-tree
 def treeview_sort_column(tv, col, reverse):
     l = [(tv.item(k)["text"], k) for k in tv.get_children()]
     l.sort(key=lambda t: t[0], reverse=reverse)
@@ -100,7 +106,6 @@ def treeview_sort_column(tv, col, reverse):
 def populate_table(self):
     singleComics = database.get_all_comic_info()
     count = 1
-    tag = "odd"
     for comic in singleComics:
         if count % 2 == 0:
             tag = "even"
@@ -111,12 +116,12 @@ def populate_table(self):
         count += 1
 
 
-# Button click to add comic
+# Button click to add comic - https://www.geeksforgeeks.org/file-explorer-in-python-using-tkinter/
 def add_comic():
     filename = filedialog.askopenfilename(initialdir="/",
                                           title="Select a File",
                                           filetypes=[("Comic Book Zips",
-                                                     "*.cbz*")])
+                                                      "*.cbz*")])
 
 
 # button click to import comics
@@ -126,13 +131,14 @@ def import_comics():
                                           filetypes=[("Comic Book Zips",
                                                       "*.cbz*")])
 
+
 def main():
     root = tk.Tk()
     root.geometry("2000x1000")
     root.title('Comic Orchard')
     root.eval('tk::PlaceWindow . center')
     create_tool_bar(root)
-    create_table(root)
+    App(root)
     populate_table(root)
     root.mainloop()
 

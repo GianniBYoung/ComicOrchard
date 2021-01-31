@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter.ttk import *
-from tkinter import ttk
+from tkinter import ttk, filedialog
 import database
 
 
@@ -10,13 +10,14 @@ def create_table(root):
     tableFrame.pack(fill=tk.BOTH, expand=True)
 
     style = ttk.Style()
-    style.configure("mystyle.Treeview", fieldbackground="#2d2d2d", foreground="white", highlightthickness=0, bd=0, font=('Times New Roman', 11))
+    style.configure("mystyle.Treeview", fieldbackground="#2d2d2d", foreground="white", highlightthickness=0, bd=0,
+                    font=('Times New Roman', 11))
     style.configure("mystyle.Treeview.Heading", foreground="white", background="#4c4c4c", font=('Times New Roman', 13))
 
     tv = Treeview(tableFrame, style="mystyle.Treeview")
     scrollbar = tk.Scrollbar(tableFrame,
-                              orient="vertical",
-                              command=tv.yview)
+                             orient="vertical",
+                             command=tv.yview)
     scrollbar.pack(side='right', fill='x')
     tv.configure(xscrollcommand=scrollbar.set)
     tv.pack(fill=tk.BOTH, expand=True)
@@ -55,14 +56,14 @@ def on_double_click(event):
 # Creates toolbar with buttons at the top
 def create_tool_bar(root):
     toolbar = tk.Frame(root, bg="#272626")
-    classButton = HoverButton(root, text="Add Comic", activebackground="#C9C9C9")
+    classButton = HoverButton(root, text="Add Comic", activebackground="#C9C9C9", command=browseFiles)
     classButton.pack(in_=toolbar, side=tk.LEFT)
     toolbar.pack(fill=tk.X)
 
 
 class HoverButton(tk.Button):
     def __init__(self, master, **kw):
-        tk.Button.__init__(self,master=master,**kw)
+        tk.Button.__init__(self, master=master, **kw)
         self.defaultBackground = self["background"]
         self.bind("<Enter>", self.on_enter)
         self.bind("<Leave>", self.on_leave)
@@ -96,7 +97,7 @@ def add_comic():
 # Populates table with all current data
 def populate_table(self):
     singleComics = database.get_all_comic_info()
-    count = 1;
+    count = 1
     tag = "odd"
     for comic in singleComics:
         if count % 2 == 0:
@@ -107,6 +108,12 @@ def populate_table(self):
                                                                comic[6], comic[7]), tags=tag)
         count += 1
 
+
+def browseFiles():
+    filename = filedialog.askopenfilename(initialdir="/",
+                                          title="Select a File",
+                                          filetypes=[("Comic Book Zips",
+                                                     "*.cbz*")])
 
 def main():
     root = tk.Tk()

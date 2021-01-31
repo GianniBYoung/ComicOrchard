@@ -7,26 +7,34 @@ import shutil
 from xml.dom import minidom
 from pathlib import Path
 
+libraryPath = "/home/gianni/.comicOrchard/main/"
 
 def obtainListOfPaths(path):
     listOfFiles = list()
+    if path.endswith("cbz"):
+        listOfFiles.append(path)
     for (dirpath, dirname, filenames) in os.walk(path, topdown=True):
         listOfFiles += [os.path.join(dirpath, file) for file in filenames]
     return listOfFiles
 
 
 #todo optimize this and make sure it checks if the directory needs to be created first
-def copyLibrary(source, destination):
-    print("copying from "+source+" to "+destination)
+def copyLibrary(source):
+    print("copying from "+source+" to "+libraryPath)
+    shutil.copytree(source, libraryPath)
+    print("copying complete")
+
+
+def copyComic(source, destination):
+    print("copying from "+source+" to "+libraryPath)
     shutil.copytree(source, destination)
     print("copying complete")
 
 
-
-def addComic(source, destination):
+def addComic(source):
     filename = source.split('/')[-1]
-    destination = destination + filename
-    copyLibrary(source, destination)
+    destination = libraryPath + filename
+    copyComic(source, destination)
     populate_database(destination)
 
 
@@ -108,66 +116,26 @@ def create_database():
 
     # creates Comics table
     cursor.execute("CREATE TABLE IF NOT EXISTS 'comics' ( \
-	    'id'	        INTEGER NOT NULL, \
-	    'title'	        TEXT, \
-	    'type'	        TEXT, \
+	    'id'	    INTEGER NOT NULL, \
+	    'title'	    TEXT, \
+	    'type'	    TEXT, \
 	    'series'	    TEXT, \
 	    'number'	    INTEGER, \
-	    'issueID'	    INTEGER, \
-	    'dateCreated'	TEXT, \
-        'writer'        TEXT, \
-        'path'          TEXT NOT NULL UNIQUE, \
+	    'issueID'	    INTEGER UNIQUE, \
+	    'dateCreated'   TEXT, \
+	    'writer'        TEXT, \
+            'path'          TEXT NOT NULL UNIQUE, \
 	    PRIMARY KEY('id' AUTOINCREMENT) \
     );")
 
     con.commit()
 
 
-def query_database(query):
-    con = sqlite3.connect('main.db')
-    con.execute("PRAGMA foreign_keys = on")
-    cursor = con.cursor()
-    cursor.execute(query)
-
-    con.commit()
-    return cursor.fetchall()
-
-
-def insert_comic(title, type, series, number, issueID, dateCreated, writer):
-    con = sqlite3.connect('main.db')
-    con.execute("PRAGMA foreign_keys = on")
-    cursor = con.cursor()
-
-    cursor.execute(
-        "INSERT INTO comics(title, type, series, number, issueID, dateCreated, writer) \
-        Values (?, ?, ?, ?, ?, ?, ?)", (title, type, series, number, issueID, dateCreated, writer))
-    con.commit()
-
-
-def clear_database():
-    con = sqlite3.connect('main.db')
-    con.execute("PRAGMA foreign_keys = on")
-    cursor = con.cursor()
-
-    cursor.executescript(
-        "DELETE FROM comics;\
-        UPDATE SQLITE_SEQUENCE SET SEQ=0 WHERE NAME='comics';"
-    )
-    con.commit()
-
-
-def get_all_comic_info():
-    comicList = query_database(
-        'SELECT * FROM comics'
-    )
-    return comicList
-
-
 def main():
     create_database()
     #populate_database("/home/gianni/.comicOrchard/main")
-    #addComic("/home/gianni/.comicOrchard/Batman Damned (1-3)","/home/gianni/.comicOrchard/main/")
-    openComicForReading("/home/gianni/.comicOrchard/Batman Damned (1-3)/Batman_ Damned #1 - Brian Azzarello.cbz")
+    addComic("/home/gianni/.comicOrchard/Batman Damned (1-3)")
+    #obtainListOfPaths("/home/gianni/.comicOrchard/Batman Damned (1-3)/Batman_ Damned #1 - Brian Azzarello.cbz")
 
 
 if __name__ == "__main__":

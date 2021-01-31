@@ -20,10 +20,7 @@ class Table(Frame):
         style.configure("mystyle.Treeview.Heading", foreground="white", background="#4c4c4c",
                         font=('Times New Roman', 13))
 
-        scrollbar = tk.Scrollbar(tableFrame,
-                                 orient="vertical",
-                                 bg="#C9C9C9",
-                                 activebackground="#B7B7B7")
+        scrollbar = tk.Scrollbar(tableFrame, orient="vertical", bg="#C9C9C9", activebackground="#B7B7B7")
         scrollbar.pack(side='right', fill=tk.Y)
 
         tv = Treeview(tableFrame, style="mystyle.Treeview", yscrollcommand=scrollbar.set)
@@ -164,7 +161,6 @@ def treeview_sort_first_column(tv, col, reverse):
 def treeview_sort_number_column(tv, col, reverse):
     l = [(tv.set(k, col), k) for k in tv.get_children('')]
     l.sort(key=lambda t: int(t[0]), reverse=reverse)
-    #      ^^^^^^^^^^^^^^^^^^^^^^^
 
     for index, (val, k) in enumerate(l):
         tv.move(k, '', index)

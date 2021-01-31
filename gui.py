@@ -1,18 +1,24 @@
 import tkinter as tk
-import database
 from tkinter.ttk import *
+from tkinter import ttk
+import database
 
 
 # Creates table for comic book info
 def create_table(root):
     tableFrame = Frame(root)
     tableFrame.pack(fill=tk.BOTH, expand=True)
-    tv = Treeview(tableFrame)
-    verscrlbar = tk.Scrollbar(tableFrame,
+
+    style = ttk.Style()
+    style.configure("mystyle.Treeview", fieldbackground="#2d2d2d", foreground="white", highlightthickness=0, bd=0, font=('Times New Roman', 11))
+    style.configure("mystyle.Treeview.Heading", foreground="white", background="#4c4c4c", font=('Times New Roman', 13))
+
+    tv = Treeview(tableFrame, style="mystyle.Treeview")
+    scrollbar = tk.Scrollbar(tableFrame,
                               orient="vertical",
                               command=tv.yview)
-    verscrlbar.pack(side='right', fill='x')
-    tv.configure(xscrollcommand=verscrlbar.set)
+    scrollbar.pack(side='right', fill='x')
+    tv.configure(xscrollcommand=scrollbar.set)
     tv.pack(fill=tk.BOTH, expand=True)
     tv.bind("<<TreeviewSelect>>", on_double_click)
     columns = ('title', 'type', 'series', 'number', 'issueID', 'date', 'writer')
@@ -34,7 +40,8 @@ def create_table(root):
     tv.heading('writer', text='Writer')
     tv.column('writer', anchor='w', width=200)
     root.treeview = tv
-    globaltv = tv
+    tv.tag_configure('odd', background='#272626')
+    tv.tag_configure('even', background='#2d2d2d')
     for col in columns:
         tv.heading(col, command=lambda _col=col:
         treeview_sort_column(tv, _col, False))
@@ -47,10 +54,24 @@ def on_double_click(event):
 
 # Creates toolbar with buttons at the top
 def create_tool_bar(root):
-    toolbar = Frame(root)
-    btnAddComic = Button(toolbar, text='Add Comic', command=add_comic)
-    btnAddComic.pack(in_=toolbar, side=tk.LEFT)
+    toolbar = tk.Frame(root, bg="#272626")
+    classButton = HoverButton(root, text="Add Comic", activebackground="green")
+    classButton.pack(in_=toolbar, side=tk.LEFT)
     toolbar.pack(fill=tk.X)
+
+
+class HoverButton(tk.Button):
+    def __init__(self, master, **kw):
+        tk.Button.__init__(self,master=master,**kw)
+        self.defaultBackground = self["background"]
+        self.bind("<Enter>", self.on_enter)
+        self.bind("<Leave>", self.on_leave)
+
+    def on_enter(self, e):
+        self['background'] = self['activebackground']
+
+    def on_leave(self, e):
+        self['background'] = self.defaultBackground
 
 
 # Sorts table when clicking on columns
@@ -75,9 +96,16 @@ def add_comic():
 # Populates table with all current data
 def populate_table(self):
     singleComics = database.get_all_comic_info()
+    count = 1;
+    tag = "odd"
     for comic in singleComics:
+        if count % 2 == 0:
+            tag = "even"
+        else:
+            tag = "odd"
         self.treeview.insert('', 'end', text=comic[0], values=(comic[1], comic[2], comic[3], comic[4], comic[5],
-                                                               comic[6], comic[7]))
+                                                               comic[6], comic[7]), tags=tag)
+        count += 1
 
 
 def main():

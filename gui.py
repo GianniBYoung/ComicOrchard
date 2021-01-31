@@ -144,18 +144,17 @@ def populate_table(self):
 
 # Button click to add comic - https://www.geeksforgeeks.org/file-explorer-in-python-using-tkinter/
 def add_comic():
-    filename = filedialog.askopenfilename(initialdir="/",
+    filename = filedialog.askopenfilename(initialdir="~",
                                           title="Select a File",
                                           filetypes=[("Comic Book Zips",
                                                       "*.cbz*")])
+    database.addComic(filename)
 
 
 # button click to import comics
 def import_comics():
-    filename = filedialog.askopenfilename(initialdir="/",
-                                          title="Select a File",
-                                          filetypes=[("Comic Book Zips",
-                                                      "*.cbz*")])
+    filename = filedialog.askdirectory()
+    database.addComics(filename)
 
 
 def main():

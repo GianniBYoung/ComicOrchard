@@ -18,30 +18,39 @@ def obtainListOfPaths(path):
     return listOfFiles
 
 
-#todo optimize this and make sure it checks if the directory needs to be created first
 def copyLibrary(source):
     print("copying from "+source+" to "+libraryPath)
-    try:
-        shutil.copytree(source, libraryPath)
-        print("copying complete")
-    except:
-        print("file already exists")
+    shutil.copytree(source, libraryPath)
+    print("copying complete")
+
+
+def copyComics(source, destination):
+    print("copying from "+source+" to "+destination)
+    shutil.copytree(source, destination)
+    print("copying complete")
 
 
 def copyComic(source, destination):
-    print("copying from "+source+" to "+libraryPath)
-    try:
-        shutil.copytree(source, destination)
-        print("copying complete")
-    except:
-        print("file already exists")
+    print("copying from "+source+" to "+destination)
+    shutil.copy(source, destination)
+    print("copying complete")
+
+
+def addComics(source):
+    filename = source.split('/')[-1]
+    destination = libraryPath + filename
+    print(destination)
+    copyComics(source, destination)
+    populate_database(destination)
 
 
 def addComic(source):
     filename = source.split('/')[-1]
     destination = libraryPath + filename
+    print(destination)
     copyComic(source, destination)
     populate_database(destination)
+
 
 
 def openComicForReading(path):
@@ -54,46 +63,42 @@ def extractMetadata(path, filename):
     year = 0
     day = 0
     month = 0
-    if zipfile.is_zipfile(path):
-        with zipfile.ZipFile(path) as zip_file:
-            with zip_file.open(filename) as f:
-                xmldoc = minidom.parse(f)
+    with zipfile.ZipFile(path) as zip_file:
+        with zip_file.open(filename) as f:
+            xmldoc = minidom.parse(f)
  
-                metadataDict["issueID"] = xmldoc.getElementsByTagName('Notes')[0].firstChild.data.split('[')[1].split(' ')[2].split(']')[0]
-                metadataDict["series"] = xmldoc.getElementsByTagName('Series')[0].firstChild.data
-                metadataDict["number"] = xmldoc.getElementsByTagName('Number')[0].firstChild.data
-                metadataDict["publisher"] = xmldoc.getElementsByTagName('Publisher')[0].firstChild.data
-                metadataDict["metadata source"] = xmldoc.getElementsByTagName('Web')[0].firstChild.data
-                metadataDict["page count"] = xmldoc.getElementsByTagName('PageCount')[0].firstChild.data
+            metadataDict["issueID"] = xmldoc.getElementsByTagName('Notes')[0].firstChild.data.split('[')[1].split(' ')[2].split(']')[0]
+            metadataDict["series"] = xmldoc.getElementsByTagName('Series')[0].firstChild.data
+            metadataDict["number"] = xmldoc.getElementsByTagName('Number')[0].firstChild.data
+            metadataDict["publisher"] = xmldoc.getElementsByTagName('Publisher')[0].firstChild.data
+            metadataDict["metadata source"] = xmldoc.getElementsByTagName('Web')[0].firstChild.data
+            metadataDict["page count"] = xmldoc.getElementsByTagName('PageCount')[0].firstChild.data
 
-                if len(xmldoc.getElementsByTagName('Title')) != 0:
-                    metadataDict["title"] = xmldoc.getElementsByTagName('Title')[0].firstChild.data
+            if len(xmldoc.getElementsByTagName('Title')) != 0:
+                metadataDict["title"] = xmldoc.getElementsByTagName('Title')[0].firstChild.data
  
 
-                if len(xmldoc.getElementsByTagName('Writer')) != 0:
-                    metadataDict["writer"] = xmldoc.getElementsByTagName('Writer')[0].firstChild.data
+            if len(xmldoc.getElementsByTagName('Writer')) != 0:
+                metadataDict["writer"] = xmldoc.getElementsByTagName('Writer')[0].firstChild.data
  
  
-                if len(xmldoc.getElementsByTagName('Characters')) != 0:
-                    metadataDict["characters"] = xmldoc.getElementsByTagName('Characters')[0].firstChild.data
+            if len(xmldoc.getElementsByTagName('Characters')) != 0:
+                metadataDict["characters"] = xmldoc.getElementsByTagName('Characters')[0].firstChild.data
  
-                if len(xmldoc.getElementsByTagName('Locations')) != 0:
-                    metadataDict["locations"] = xmldoc.getElementsByTagName('Locations')[0].firstChild.data
+            if len(xmldoc.getElementsByTagName('Locations')) != 0:
+                metadataDict["locations"] = xmldoc.getElementsByTagName('Locations')[0].firstChild.data
  
  
-                year = xmldoc.getElementsByTagName('Year')[0].firstChild.data
-                month = xmldoc.getElementsByTagName('Month')[0].firstChild.data
-                day = xmldoc.getElementsByTagName('Day')[0].firstChild.data
+            year = xmldoc.getElementsByTagName('Year')[0].firstChild.data
+            month = xmldoc.getElementsByTagName('Month')[0].firstChild.data
+            day = xmldoc.getElementsByTagName('Day')[0].firstChild.data
 
-                releaseDate = datetime.datetime(int(year),int(month),int(day))
-                metadataDict["date"] = releaseDate.strftime("%Y/%m/%d")
+            releaseDate = datetime.datetime(int(year),int(month),int(day))
+            metadataDict["date"] = releaseDate.strftime("%Y/%m/%d")
  
-                return metadataDict
-    else:
-        print(path + " is not a zip file")
+            return metadataDict
 
 
- # need to find a way to determine type
 def populate_database(basePath):
     listOfFiles = obtainListOfPaths(basePath)
     con = sqlite3.connect('main.db')
@@ -181,8 +186,8 @@ def get_all_comic_info():
 
 def main():
     create_database()
-    #populate_database("/home/gianni/.comicOrchard/main")
-    addComic("/home/gianni/.comicOrchard/Batman Damned (1-3)")
+    populate_database("/home/gianni/.comicOrchard/main")
+    #addComic("/home/gianni/.comicOrchard/Batman Damned (1-3)")
     #obtainListOfPaths("/home/gianni/.comicOrchard/Batman Damned (1-3)/Batman_ Damned #1 - Brian Azzarello.cbz")
 
 

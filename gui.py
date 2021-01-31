@@ -14,11 +14,15 @@ def create_table(root):
                     font=('Times New Roman', 11))
     style.configure("mystyle.Treeview.Heading", foreground="white", background="#4c4c4c", font=('Times New Roman', 13))
 
-    tv = Treeview(tableFrame, style="mystyle.Treeview")
     scrollbar = tk.Scrollbar(tableFrame,
-                             orient="vertical",
-                             command=tv.yview)
-    scrollbar.pack(side='right', fill='x')
+                          orient="vertical",
+                          bg="#C9C9C9",
+                          activebackground="#B7B7B7")
+    scrollbar.pack(side='right', fill=tk.Y)
+
+    tv = Treeview(tableFrame, style="mystyle.Treeview", yscrollcommand=scrollbar.set)
+    scrollbar.config(command=tv.yview)
+
     tv.configure(xscrollcommand=scrollbar.set)
     tv.pack(fill=tk.BOTH, expand=True)
     tv.bind("<<TreeviewSelect>>", on_double_click)

@@ -92,6 +92,7 @@ class Toolbar(Frame):
         self.master.entry = searchEntry
         toolbar.pack(fill=tk.X)
 
+    # Search when enter is pressed - https://www.sourcecodester.com/tutorials/python/11382/python-simple-table-search-filter.html
     def search(self, event):
         searchText = self.master.entry.get()
         if searchText != "":
@@ -107,6 +108,7 @@ class Toolbar(Frame):
                                                            data[6], data[7], data[8]), tags=tag)
             count += 1
 
+    # Reset table to before the search
     def reset(self):
         self.master.treeview.delete(*self.master.treeview.get_children())
         results = database.get_all_comic_info()

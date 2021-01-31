@@ -114,6 +114,13 @@ def extractMetadata(path, filename):
                         metadataDict["cover artist"] = xmldoc.getElementsByTagName('CoverArtist')[0].firstChild.data
 
 
+                    if len(xmldoc.getElementsByTagName("Colorist")) == 0:
+                        print("no colorist found")
+                        metadataDict["colorist"] = 'NULL'
+                    else:
+                        metadataDict["colorist"] = xmldoc.getElementsByTagName('Colorists')[0].firstChild.data
+
+
                     if len(xmldoc.getElementsByTagName("Editor")) == 0:
                         print("no editor found")
                         metadataDict["editor"] = 'NULL'
@@ -157,7 +164,7 @@ def extractMetadata(path, filename):
 
                     releaseDate = datetime.datetime(int(year),int(month),int(day))
                     metadataDict["date"] = releaseDate.strftime("%Y/%m/%d")
-                    print(metadataDict)
+                    # print(metadataDict)
                     return metadataDict
             except:
                 print("no ComicInfo.xml found")
@@ -180,11 +187,51 @@ def populate_database(basePath):
         if path.endswith("cbz"):
             metadataDict = extractMetadata(path,"ComicInfo.xml")
 
-            try:
-                cursor.execute('''INSERT OR IGNORE INTO Comics(title, type, series, number, issueID, dateCreated, path) VALUES (?,?,?,?,?,?,?)''', (str(metadataDict["title"]), "issue" ,str(metadataDict["series"]),metadataDict["number"], metadataDict["issueID"],str(metadataDict["date"]),str(path)))
-            except:
-                 print("unable to add "+ path)
-    con.commit()
+                # cursor.execute('''INSERT OR IGNORE INTO Comics(title, type, series, number, issueID, dateCreated, path) VALUES (?,?,?,?,?,?,?)''', (str(metadataDict["title"]), "issue" ,str(metadataDict["series"]),metadataDict["number"], metadataDict["issueID"],str(metadataDict["date"]),str(path)))
+
+
+            # coverArtists = metadataDict["cover artist"].split(',')
+            # writers = metadataDict["writer"].split(',')
+            # letterers = metadataDict["letterer"].split(',')
+            # pencillers = metadataDict["penciller"].split(',')
+            # editors = metadataDict["editor"].split(',')
+            # inkers = metadataDict["inker"].split(',')
+            # colorists = metadataDict["colorist"].split(',')
+
+            creators = []
+
+            # for item in coverArtists:
+                # temptup = ("Cover Artist", item)
+                # creators.append(temptup)
+
+            # for item in writers:
+                # temptup = ("Writer", item)
+                # creators.append(temptup)
+
+            # for item in letterers:
+                # temptup = ("Letterer",item)
+                # creators.append(temptup)
+
+            # for item in pencillers:
+                # temptup = ("Penciller", item)
+                # creators.append(temptup)
+
+            # for item in editors:
+                # temptup = ("Editor", item)
+                # creators.append(temptup)
+
+            # for item in inkers:
+                # temptup = ("Inker", item)
+                # creators.append(temptup)
+
+            # for item in colorists:
+                # temptup = ("colorist", item)
+                # cursor.execute('''INSERT OR IGNORE INTO creators VALUES(?,?);''',("colorist", str(item)))
+                # creators.append(temptup)
+
+
+            cursor.executemany('''INSERT OR IGNORE INTO creators(position, name) VALUES (?,?);''', creators)
+            con.commit()
 
 
 

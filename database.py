@@ -21,6 +21,15 @@ def copyLibrary(source, destination):
     print("copying complete")
 
 
+
+def addComic(source, destination):
+    filename = source.split('/')[-1]
+    destination = destination + filename
+    copyLibrary(source, destination)
+    populate_database(destination)
+
+
+
 #returns a dictionary with metadata where the filename is the metadata file
 def extractMetadata(path, filename):
     metadataDict ={}
@@ -95,14 +104,15 @@ def create_database():
 
     # creates Comics table
     cursor.execute("CREATE TABLE IF NOT EXISTS 'comics' ( \
-	    'id'	    INTEGER NOT NULL, \
-	    'title'	    TEXT, \
-	    'type'	    TEXT, \
+	    'id'	        INTEGER NOT NULL, \
+	    'title'	        TEXT, \
+	    'type'	        TEXT, \
 	    'series'	    TEXT, \
 	    'number'	    INTEGER, \
 	    'issueID'	    INTEGER, \
 	    'dateCreated'	TEXT, \
         'writer'        TEXT, \
+        'path'          TEXT NOT NULL UNIQUE, \
 	    PRIMARY KEY('id' AUTOINCREMENT) \
     );")
 
@@ -151,6 +161,8 @@ def get_all_comic_info():
 
 def main():
     create_database()
+    #populate_database("/home/gianni/.comicOrchard/main")
+    addComic("/home/gianni/.comicOrchard/Batman Damned (1-3)","/home/gianni/.comicOrchard/main/")
 
 
 if __name__ == "__main__":

@@ -55,7 +55,7 @@ def on_double_click(event):
 # Creates toolbar with buttons at the top
 def create_tool_bar(root):
     toolbar = tk.Frame(root, bg="#272626")
-    classButton = HoverButton(root, text="Add Comic", activebackground="green")
+    classButton = HoverButton(root, text="Add Comic", activebackground="#C9C9C9")
     classButton.pack(in_=toolbar, side=tk.LEFT)
     toolbar.pack(fill=tk.X)
 

@@ -62,9 +62,10 @@ class Table(Frame):
 
     # Method for double clicking a comic
     def on_double_click(self, e):
-        item = self.master.treeview.item(self.master.treeview.focus())
-        comicPath = item['values'][7]
-        database.openComicForReading(comicPath)
+        if e.y > 22:
+            item = self.master.treeview.item(self.master.treeview.focus())
+            comicPath = item['values'][7]
+            database.openComicForReading(comicPath)
 
 
 class Toolbar(Frame):

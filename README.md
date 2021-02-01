@@ -9,4 +9,4 @@ Our program uses an sqlite database as a background and is written in python. Th
 
 
 
-![Image of Comic Orchard](https://github.com/GianniBYoung/blob/main/ComicOrchard/Comic_Orchard.png?raw=true)
+![Image of Comic Orchard](https://github.com/GianniBYoung/ComicOrchard/blob/main/Comic_Orchard.png?raw=true)
